@@ -1,6 +1,6 @@
 <?php
 
-Class Router
+class Router
 {
 	private $routes;
 
@@ -28,7 +28,6 @@ Class Router
      */
 	public function run()
 	{
-		//Получить строку запроса
 		$uri = $this->getURI();
 
 		foreach ($this->routes as $uriPattern => $path) {

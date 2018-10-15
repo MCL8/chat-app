@@ -6,13 +6,11 @@ class UserController
 	{
 	    $db = DB::getConnection();
 
-		session_start();
-
 		$message = '';
 
 		if(isset($_SESSION['user_id']))
 		{
-			header('location:index.php');
+			header('location: /');
 		}
 
 		if(isset($_POST['login']))
@@ -45,7 +43,7 @@ class UserController
 						$queryResult = $db->prepare($sub_query);
 						$queryResult->execute();
 						$_SESSION['login_details_id'] = $db->lastInsertId();
-						header('location:index.php');
+						header('location: /');
 					}
 					else
 					{
@@ -60,5 +58,7 @@ class UserController
 		}
 
 		require_once ROOT . '/views/login/index.php';
+
+		return true;
 	}
 }
