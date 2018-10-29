@@ -10,6 +10,7 @@
   		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   		<script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script>
   		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script>
+        <script src="/template/js/ajax.js"></script>
     </head>  
     <body>  
         <div class="container">
@@ -24,7 +25,7 @@
 					<button type="button" name="group_chat" id="group_chat" class="btn btn-warning btn-xs">Group Chat</button>
 				</div>
 				<div class="col-md-2 col-sm-3">
-					<p class="align-right">Hi - <?php echo $_SESSION['username']; ?> - <a href="logout.php">Logout</a></p>
+					<p class="align-right">Hi - <?php echo $_SESSION['username']; ?> - <a href="logout">Logout</a></p>
 				</div>
 			</div>
 			<div class="table-responsive">
@@ -61,4 +62,3 @@
 	</div>
 </div>
 
-<script src="/template/js/main.js"></script>

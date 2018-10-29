@@ -1,27 +1,23 @@
-$(document).ready(function(){
 
-	fetch_user();
+$(document).ready(function(){
+	getUser();
 
 	setInterval(function(){
-		update_last_activity();
-		fetch_user();
-		update_chat_history_data();
-		fetch_group_chat_history();
+		updateLastActivity();
+		getUser();
+		updateChatHistory();
+		getGroupChatHistory();
 	}, 5000);
 
-	function update_last_activity()
-	{
+	function updateLastActivity() {
 		$.ajax({
 			url:"update/last_activity",
-			success:function()
-			{
-
+			success:function() {
 			}
 		});
 	}
 
-	function fetch_user()
-	{
+	function getUser() {
 		$.ajax({
 			url:"update/get_user",
 			method:"POST",
@@ -31,8 +27,7 @@ $(document).ready(function(){
 		});
 	}
 
-	function fetch_user_chat_history(to_user_id)
-	{
+	function getUserChatHistory(to_user_id) {
 		$.ajax({
 			url:"update/chat_history",
 			method:"POST",
@@ -43,39 +38,33 @@ $(document).ready(function(){
 		});
 	}
 
-	function update_chat_history_data()
-	{
+	function updateChatHistory() {
 		$('.chat_history').each(function(){
 			var to_user_id = $(this).data('touserid');
-			fetch_user_chat_history(to_user_id);
+			getUserChatHistory(to_user_id);
 		});
 	}
 
-	function fetch_group_chat_history()
-	{
+	function getGroupChatHistory() {
 		var group_chat_dialog_active = $('#is_active_group_chat_window').val();
 		var action = "fetch_data";
 		if(group_chat_dialog_active == 'yes')
 		{
 			$.ajax({
-				url:"group_chat.php",
+				url:"update/group_chat_history",
 				method:"POST",
 				data:{action:action},
-				success:function(data)
-				{
+				success:function(data) {
 					$('#group_chat_history').html(data);
 				}
 			})
 		}
 	}
 
-	
-
-	function make_chat_dialog_box(to_user_id, to_user_name)
-	{
+	function makeChatDialogBox(to_user_id, to_user_name) {
 		var modal_content = '<div id="user_dialog_' + to_user_id + '" class="user_dialog" title="You have chat with ' + to_user_name + '">';
 		modal_content += '<div style="height:400px; border:1px solid #ccc; overflow-y: scroll; margin-bottom:24px; padding:16px;" class="chat_history" data-touserid="'+to_user_id+'" id="chat_history_'+to_user_id+'">';
-		modal_content += fetch_user_chat_history(to_user_id);
+		modal_content += getUserChatHistory(to_user_id);
 		modal_content += '</div>';
 		modal_content += '<div class="form-group">';
 		modal_content += '<textarea name="chat_message_' + to_user_id + '" id="chat_message_' + to_user_id + '" class="form-control chat_message"></textarea>';
@@ -87,7 +76,7 @@ $(document).ready(function(){
 	$(document).on('click', '.start_chat', function(){
 		var to_user_id = $(this).data('touserid');
 		var to_user_name = $(this).data('tousername');
-		make_chat_dialog_box(to_user_id, to_user_name);
+		makeChatDialogBox(to_user_id, to_user_name);
 		$("#user_dialog_" + to_user_id).dialog({
 			autoOpen:false,
 			width:400
@@ -103,12 +92,10 @@ $(document).ready(function(){
 		var to_user_id = $(this).attr('id');
 		var chat_message = $('#chat_message_' + to_user_id).val();
 		$.ajax({
-			url: "insert_chat.php",
+			url: "insert_message",
 			method: "POST",
 			data: {to_user_id:to_user_id, chat_message:chat_message},
-			success:function(data)
-			{
-				//$('#chat_message_'+to_user_id).val('');
+			success:function(data) {
 				var element = $('#chat_message_' + to_user_id).emojioneArea();
 				element[0].emojioneArea.setText('');
 				$('#chat_history_' + to_user_id).html(data);
@@ -124,12 +111,10 @@ $(document).ready(function(){
 	$(document).on('focus', '.chat_message', function(){
 		var is_type = 'yes';
 		$.ajax({
-			url:"update_is_type_status.php",
+			url:"update/is_type",
 			method:"POST",
 			data:{is_type:is_type},
-			success:function()
-			{
-
+			success:function() {
 			}
 		})
 	});
@@ -137,12 +122,10 @@ $(document).ready(function(){
 	$(document).on('blur', '.chat_message', function(){
 		var is_type = 'no';
 		$.ajax({
-			url:"update_is_type_status.php",
+			url:"update/is_type",
 			method:"POST",
 			data:{is_type:is_type},
-			success:function()
-			{
-				
+			success:function() {
 			}
 		})
 	});
@@ -155,7 +138,7 @@ $(document).ready(function(){
 	$('#group_chat').click(function(){
 		$('#group_chat_dialog').dialog('open');
 		$('#is_active_group_chat_window').val('yes');
-		fetch_group_chat_history();
+		getGroupChatHistory();
 	});
 
 	$('#send_group_chat').click(function(){
@@ -164,7 +147,7 @@ $(document).ready(function(){
 		if(chat_message != '')
 		{
 			$.ajax({
-				url:"group_chat.php",
+				url:"insert_group_message",
 				method:"POST",
 				data:{chat_message:chat_message, action:action},
 				success:function(data){
@@ -181,5 +164,4 @@ $(document).ready(function(){
 			resetForm: true
 		});
 	});
-	
-});  
+});
