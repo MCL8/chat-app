@@ -7,7 +7,7 @@ $(document).ready(function(){
 		getUser();
 		updateChatHistory();
 		getGroupChatHistory();
-	}, 5000);
+	}, 1000);
 
 	function updateLastActivity() {
 		$.ajax({

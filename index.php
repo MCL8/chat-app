@@ -7,6 +7,8 @@ session_start();
 
 define('ROOT', dirname(__FILE__));
 
+date_default_timezone_set('Asia/Dhaka');
+
 require_once(ROOT.'/components/Autoload.php');
 
 $router = new Router();

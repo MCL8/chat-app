@@ -2,6 +2,43 @@
 
 class Message
 {
+    public static function getUserChatHistory($from_user_id, $to_user_id)
+    {
+        $db = DB::getConnection();
+
+        $sql = "
+            SELECT * FROM chat_message 
+            WHERE (from_user_id = '".$from_user_id."' 
+            AND to_user_id = '".$to_user_id."') 
+            OR (from_user_id = '".$to_user_id."' 
+            AND to_user_id = '".$from_user_id."') 
+            ORDER BY timestamp DESC
+            ";
+
+        $queryResult = $db->prepare($sql);
+        $queryResult->execute();
+
+        self::updateChatHistory($from_user_id, $to_user_id, $db);
+
+        return $queryResult->fetchAll();
+    }
+
+    public static function getGroupChatHistory()
+    {
+        $db = DB::getConnection();
+
+        $sql = "
+            SELECT * FROM chat_message 
+            WHERE to_user_id = '0'  
+            ORDER BY timestamp DESC
+            ";
+
+        $queryResult = $db->prepare($sql);
+        $queryResult->execute();
+
+        return $queryResult->fetchAll();
+    }
+
     public static function insertMessage()
     {
         $db = DB::getConnection();
@@ -13,19 +50,18 @@ class Message
             ':status' => '1'
         );
 
-        $query = "
+        $sql = "
                 INSERT INTO chat_message 
                 (to_user_id, from_user_id, chat_message, status) 
                 VALUES (:to_user_id, :from_user_id, :chat_message, :status)
                 ";
 
-        $statement = $db->prepare($query);
-
-        if ($statement->execute($data)) {
-            echo Message::getUserChatHistory($_SESSION['user_id'], $_POST['to_user_id']);
+        $queryResult = $db->prepare($sql);
+        if ($queryResult->execute($data)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public static function insertGroupMessage()
@@ -40,65 +76,26 @@ class Message
                 ':status' => '1'
             );
 
-            $query = "
+            $sql = "
                 INSERT INTO chat_message 
                 (from_user_id, chat_message, status) 
                 VALUES (:from_user_id, :chat_message, :status)
                 ";
 
-            $statement = $db->prepare($query);
+            $queryResult = $db->prepare($sql);
 
-            if ($statement->execute($data)) {
-                echo Message::getGroupChatHistory();
+            if ($queryResult->execute($data)) {
+                return true;
             }
 
         }
 
-        if ($_POST["action"] == "fetch_data") {
-            echo Message::getGroupChatHistory();
-        }
-    }
-
-    public static function getUserChatHistory($from_user_id, $to_user_id)
-    {
-        $db = DB::getConnection();
-
-        $query = "
-            SELECT * FROM chat_message 
-            WHERE (from_user_id = '".$from_user_id."' 
-            AND to_user_id = '".$to_user_id."') 
-            OR (from_user_id = '".$to_user_id."' 
-            AND to_user_id = '".$from_user_id."') 
-            ORDER BY timestamp DESC
-            ";
-
-        $queryResult = $db->prepare($query);
-        $queryResult->execute();
-
-        self::updateChatHistory($from_user_id, $to_user_id, $db);
-
-        return $queryResult->fetchAll();
-    }
-
-    public static function getGroupChatHistory()
-    {
-        $db = DB::getConnection();
-
-        $query = "
-            SELECT * FROM chat_message 
-            WHERE to_user_id = '0'  
-            ORDER BY timestamp DESC
-            ";
-
-        $queryResult = $db->prepare($query);
-        $queryResult->execute();
-
-        return $queryResult->fetchAll();
+        return false;
     }
 
     private static function  updateChatHistory($from_user_id, $to_user_id, $db)
     {
-        $query = "
+        $sql = "
             UPDATE chat_message 
             SET status = '0' 
             WHERE from_user_id = '".$to_user_id."' 
@@ -106,7 +103,7 @@ class Message
             AND status = '1'
             ";
 
-        $queryResult = $db->prepare($query);
+        $queryResult = $db->prepare($sql);
         $queryResult->execute();
     }
 }

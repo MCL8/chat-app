@@ -34,9 +34,9 @@ class User
             WHERE user_id != '".$_SESSION['user_id']."' 
             ";
 
-        $statement = $db->prepare($sql);
-        $statement->execute();
-        $queryResult = $statement->fetchAll();
+        $queryResult = $db->prepare($sql);
+        $queryResult->execute();
+        $queryResult = $queryResult->fetchAll();
 
         return $queryResult;
     }
@@ -103,39 +103,11 @@ class User
         return $message;
     }
 
-    public static function updateLastActivity()
-    {
-        $db = DB::getConnection();
-
-        session_start();
-
-        $sql = "
-            UPDATE login_details 
-            SET last_activity = now() 
-            WHERE login_details_id = '" . $_SESSION["login_details_id"]."'
-        ";
-
-        $queryResult = $db->prepare($sql);
-
-        $queryResult->execute();
-    }
-
-    public static function updateIsType()
-    {
-        $db = DB::getConnection();
-
-        $sql = "
-            UPDATE login_details 
-            SET is_type = '".$_POST["is_type"]."' 
-            WHERE login_details_id = '".$_SESSION["login_details_id"]."'
-            ";
-
-        $statement = $db->prepare($sql);
-        $statement->execute();
-    }
-
     public static function countNewMessages($from_user_id, $to_user_id, $connect)
     {
+        $from_user_id = intval($from_user_id);
+        $to_user_id = intval($to_user_id);
+
         $sql = "
             SELECT * FROM chat_message 
             WHERE from_user_id = '$from_user_id' 
@@ -143,12 +115,12 @@ class User
             AND status = '1'
             ";
 
-        $statement = $connect->prepare($sql);
-        $statement->execute();
-        $count = $statement->rowCount();
+        $queryResult = $connect->prepare($sql);
+        $queryResult->execute();
+        $count = $queryResult->rowCount();
 
         if ($count > 0) {
-            return $statement->rowCount();
+            return $queryResult->rowCount();
         }
 
         return null;
@@ -156,6 +128,8 @@ class User
 
     public static function getIsType($user_id, $connect)
     {
+        $user_id = intval($user_id);
+
         $sql = "
             SELECT is_type FROM login_details 
             WHERE user_id = '".$user_id."' 
@@ -163,9 +137,9 @@ class User
             LIMIT 1
             ";
 
-        $statement = $connect->prepare($sql);
-        $statement->execute();
-        $result = $statement->fetchAll();
+        $queryResult = $connect->prepare($sql);
+        $queryResult->execute();
+        $result = $queryResult->fetchAll();
         $output = '';
 
         foreach($result as $row)
@@ -194,5 +168,36 @@ class User
         $_SESSION['login_details_id'] = $db->lastInsertId();
 
         return true;
+    }
+
+    public static function updateIsType()
+    {
+        $db = DB::getConnection();
+
+        $sql = "
+            UPDATE login_details 
+            SET is_type = '".$_POST["is_type"]."' 
+            WHERE login_details_id = '".$_SESSION["login_details_id"]."'
+            ";
+
+        $queryResult = $db->prepare($sql);
+        $queryResult->execute();
+    }
+
+    public static function updateLastActivity()
+    {
+        $db = DB::getConnection();
+
+        session_start();
+
+        $sql = "
+            UPDATE login_details 
+            SET last_activity = now() 
+            WHERE login_details_id = '" . $_SESSION["login_details_id"]."'
+        ";
+
+        $queryResult = $db->prepare($sql);
+
+        $queryResult->execute();
     }
 }
