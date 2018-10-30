@@ -7,11 +7,11 @@ return array(
     'insert_message' => 'message/insertMessage',
     'insert_group_message' => 'message/insertGroupMessage',
 
-    'update/last_activity' => 'update/updateLastActivity',
-    'update/get_user' => 'update/getUser',
-    'update/chat_history' => 'update/getUserChatHistory',
-    'update/group_chat_history' => 'update/getGroupChatHistory',
-    'update/is_type' => 'update/updateIsType',
+    'update/last_activity' => 'user/updateLastActivity',
+    'update/get_user' => 'user/getUser',
+    'update/chat_history' => 'message/getUserChatHistory',
+    'update/group_chat_history' => 'message/getGroupChatHistory',
+    'update/is_type' => 'user/updateIsType',
 
     '' => 'site/index',
 );

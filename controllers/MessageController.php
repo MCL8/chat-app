@@ -11,12 +11,7 @@ class MessageController
         }
 
         if ($insert) {
-            $db = DB::getConnection();
-            $from_user_id = $_SESSION['user_id'];
-            $to_user_id = $_POST['to_user_id'];
-            $messagesList = Message::getUserChatHistory($from_user_id, $to_user_id);
-
-            include ROOT . '/views/layouts/chat_history.php';
+            $this->userChatHistory();
         }
 
         return true;
@@ -31,14 +26,44 @@ class MessageController
         }
 
         if ($insert) {
-            $db = DB::getConnection();
-            $from_user_id = $_SESSION['user_id'];
-            $messagesList = Message::getGroupChatHistory();
-
-            include ROOT . '/views/layouts/chat_history.php';
+            $this->groupChatHistory();
         }
 
         return true;
+    }
+
+
+    public function actionGetUserChatHistory()
+    {
+        $this->userChatHistory();
+
+        return true;
+    }
+
+    public function actionGetGroupChatHistory()
+    {
+        $this->groupChatHistory();
+
+        return true;
+    }
+
+    private function userChatHistory()
+    {
+        $db = DB::getConnection();
+        $from_user_id = $_SESSION['user_id'];
+        $to_user_id = $_POST['to_user_id'];
+        $messagesList = Message::getUserChatHistory($from_user_id, $to_user_id);
+
+        include ROOT . '/views/layouts/chat_history.php';
+    }
+
+    private function groupChatHistory()
+    {
+        $db = DB::getConnection();
+        $from_user_id = $_SESSION['user_id'];
+        $messagesList = Message::getGroupChatHistory();
+
+        include ROOT . '/views/layouts/chat_history.php';
     }
 
 }

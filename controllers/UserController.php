@@ -2,6 +2,20 @@
 
 class UserController
 {
+    public function actionGetUser()
+    {
+        $db = DB::getConnection();
+        $usersList = User::getUser();
+        $status = '';
+
+        $currentTime = strtotime(date("Y-m-d H:i:s") . '- 10 second');
+        $currentTime = date('Y-m-d H:i:s', $currentTime);
+
+        include ROOT . '/views/layouts/users_table.php';
+
+        return true;
+    }
+
 	public function actionLogin()
 	{
 		$message = '';
@@ -25,6 +39,18 @@ class UserController
 
         header('location: login');
 
+        return true;
+    }
+
+    public function actionUpdateLastActivity()
+    {
+        User::updateLastActivity();
+        return true;
+    }
+
+    public function actionUpdateIsType()
+    {
+        User::updateIsType();
         return true;
     }
 }
