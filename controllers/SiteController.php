@@ -2,6 +2,9 @@
 
 class SiteController
 {
+    /**
+     * @return bool
+     */
 	public function actionIndex()
 	{
 		//session_start();

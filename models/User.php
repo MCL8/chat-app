@@ -2,11 +2,40 @@
 
 class User
 {
-    public static function auth($userId)
+    /**
+     * @param int $userId
+     */
+    public static function auth(int $userId)
     {
         $_SESSION['user'] = $userId;
     }
 
+    /**
+     * @param string $username
+     * @return bool
+     */
+    public static function checkNameExists(string $username)
+    {
+        $db = Db::getConnection();
+
+        $sql = 'SELECT COUNT(*) FROM users WHERE username = :username';
+
+        $queryResult = $db->prepare($sql);
+        $queryResult->bindParam(':username', $username, PDO::PARAM_STR);
+        $queryResult->execute();
+
+        if ($queryResult->fetchColumn()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $email
+     * @param string $password
+     * @return bool
+     */
     public static function checkUserData(string $email, string $password)
     {
         $db = DB::getConnection();
@@ -22,35 +51,43 @@ class User
         if ($user && password_verify($password, $user['password'])) {
             return $user['id'];
         }
+
         return false;
     }
 
+    /**
+     * @return array|null|PDOStatement
+     */
     public static function getUser()
     {
-        $db = DB::getConnection();
+        if (isset( $_SESSION['user_id'])) {
+            $db = DB::getConnection();
 
-        $sql = "
-            SELECT * FROM login 
-            WHERE user_id != '".$_SESSION['user_id']."' 
-            ";
+            $sql = "SELECT * FROM users 
+                WHERE user_id != '" . $_SESSION['user_id'] . "' ";
 
-        $queryResult = $db->prepare($sql);
-        $queryResult->execute();
-        $queryResult = $queryResult->fetchAll();
+            $queryResult = $db->prepare($sql);
+            $queryResult->execute();
+            $queryResult = $queryResult->fetchAll();
 
-        return $queryResult;
+            return $queryResult;
+        }
+
+        return null;
     }
 
-    public static function getUserLastActivity($user_id)
+    /**
+     * @param int $user_id
+     * @return mixed
+     */
+    public static function getUserLastActivity(int $user_id)
     {
         $db = DB::getConnection();
 
-        $sql = "
-            SELECT * FROM login_details 
-            WHERE user_id = '$user_id' 
-            ORDER BY last_activity DESC 
-            LIMIT 1
-            ";
+        $sql = " SELECT * FROM user_activity 
+                WHERE user_id = '$user_id' 
+                ORDER BY last_activity DESC 
+                LIMIT 1";
 
         $queryResult = $db->prepare($sql);
         $queryResult->execute();
@@ -58,9 +95,14 @@ class User
         return $queryResult->fetch()['last_activity'];
     }
 
+    /**
+     * @param $user_id
+     * @param $connect
+     * @return mixed
+     */
     public static function getUserName($user_id, $connect)
     {
-        $sql = "SELECT username FROM login WHERE user_id = '$user_id'";
+        $sql = "SELECT username FROM users WHERE user_id = '$user_id'";
         $statement = $connect->prepare($sql);
         $statement->execute();
         $result = $statement->fetchAll();
@@ -71,12 +113,16 @@ class User
         }
     }
 
-    public static function login($username, $password)
+    /**
+     * @param string $username
+     * @param string $password
+     * @return string
+     */
+    public static function login(string $username, string $password)
     {
         $db = DB::getConnection();
         $message = '';
-        $sql = 'SELECT * FROM login ' .
-            'WHERE username = :username';
+        $sql = 'SELECT * FROM users WHERE username = :username';
 
         $queryResult = $db->prepare($sql);
         $queryResult->bindParam(':username', $username, PDO::PARAM_STR);
@@ -91,8 +137,6 @@ class User
                     $_SESSION['username'] = $row['username'];
 
                     self::insertLastActivity($row['user_id'], $db);
-
-                    header('location: /');
                 } else {
                     $message = '<label>Wrong Password</label>';
                 }
@@ -103,19 +147,41 @@ class User
         return $message;
     }
 
-    public static function countNewMessages($from_user_id, $to_user_id, $connect)
+
+    /**
+     * @param string $username
+     * @param string $password
+     * @return bool
+     */
+    public static function register(string $username, string $password)
     {
-        $from_user_id = intval($from_user_id);
-        $to_user_id = intval($to_user_id);
+        $db = DB::getConnection();
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
-        $sql = "
-            SELECT * FROM chat_message 
-            WHERE from_user_id = '$from_user_id' 
-            AND to_user_id = '$to_user_id' 
-            AND status = '1'
-            ";
+        $sql = 'INSERT INTO users (username, password) 
+                VALUES (:username, :password)';
 
-        $queryResult = $connect->prepare($sql);
+        $queryResult = $db->prepare($sql);
+        $queryResult->bindParam(':username', $username, PDO::PARAM_STR);
+        $queryResult->bindParam(':password', $password, PDO::PARAM_STR);
+
+        return $queryResult->execute();
+    }
+
+    /**
+     * @param int $from_user_id
+     * @param int $to_user_id
+     * @param PDO $db
+     * @return int|null
+     */
+    public static function countNewMessages(int $from_user_id, int $to_user_id, PDO $db)
+    {
+        $sql = "SELECT * FROM message 
+                WHERE from_user_id = '$from_user_id' 
+                AND to_user_id = '$to_user_id' 
+                AND status = '1'";
+
+        $queryResult = $db->prepare($sql);
         $queryResult->execute();
         $count = $queryResult->rowCount();
 
@@ -126,18 +192,19 @@ class User
         return null;
     }
 
-    public static function getIsType($user_id, $connect)
+    /**
+     * @param int $user_id
+     * @param PDO $db
+     * @return string
+     */
+    public static function getIsType(int $user_id, PDO $db)
     {
-        $user_id = intval($user_id);
+        $sql = "SELECT is_type FROM user_activity 
+                WHERE user_id = '".$user_id."' 
+                ORDER BY last_activity DESC 
+                LIMIT 1";
 
-        $sql = "
-            SELECT is_type FROM login_details 
-            WHERE user_id = '".$user_id."' 
-            ORDER BY last_activity DESC 
-            LIMIT 1
-            ";
-
-        $queryResult = $connect->prepare($sql);
+        $queryResult = $db->prepare($sql);
         $queryResult->execute();
         $result = $queryResult->fetchAll();
         $output = '';
@@ -152,15 +219,18 @@ class User
         return $output;
     }
 
-    private static function insertLastActivity($user_id, $db)
+    /**
+     * @param int $user_id
+     * @param PDO $db
+     * @return bool
+     */
+    private static function insertLastActivity(int $user_id, PDO $db)
     {
         $user_id = intval($user_id);
 
-        $sql = "
-                INSERT INTO login_details 
+        $sql = "INSERT INTO user_activity 
                 (user_id) 
-                VALUES ('" . $user_id . "')
-                ";
+                VALUES ('" . $user_id . "')";
 
         $queryResult = $db->prepare($sql);
         $queryResult->execute();
@@ -170,34 +240,37 @@ class User
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public static function updateIsType()
     {
         $db = DB::getConnection();
 
-        $sql = "
-            UPDATE login_details 
-            SET is_type = '".$_POST["is_type"]."' 
-            WHERE login_details_id = '".$_SESSION["login_details_id"]."'
-            ";
+        $sql = "UPDATE user_activity 
+                SET is_type = '".$_POST["is_type"]."' 
+                WHERE login_details_id = '" . $_SESSION["login_details_id"] . "'";
 
         $queryResult = $db->prepare($sql);
-        $queryResult->execute();
+        return $queryResult->execute();
     }
 
+    /**
+     * @return bool
+     */
     public static function updateLastActivity()
     {
         $db = DB::getConnection();
 
         session_start();
 
-        $sql = "
-            UPDATE login_details 
-            SET last_activity = now() 
-            WHERE login_details_id = '" . $_SESSION["login_details_id"]."'
-        ";
+        $sql = "UPDATE user_activity 
+                SET last_activity = now() 
+                WHERE login_details_id = '" . $_SESSION["login_details_id"] . "'";
 
         $queryResult = $db->prepare($sql);
 
-        $queryResult->execute();
+        return $queryResult->execute();
+
     }
 }

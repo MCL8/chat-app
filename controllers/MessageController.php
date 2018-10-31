@@ -2,6 +2,9 @@
 
 class MessageController
 {
+    /**
+     * @return bool
+     */
     public function actionInsertMessage()
     {
         $insert = false;
@@ -16,7 +19,10 @@ class MessageController
 
         return true;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function actionInsertGroupMessage()
     {
         $insert = false;
@@ -32,7 +38,9 @@ class MessageController
         return true;
     }
 
-
+    /**
+     * @return bool
+     */
     public function actionGetUserChatHistory()
     {
         $this->userChatHistory();
@@ -40,6 +48,9 @@ class MessageController
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function actionGetGroupChatHistory()
     {
         $this->groupChatHistory();
@@ -47,6 +58,9 @@ class MessageController
         return true;
     }
 
+    /**
+     * @return bool
+     */
     private function userChatHistory()
     {
         $db = DB::getConnection();
@@ -55,8 +69,13 @@ class MessageController
         $messagesList = Message::getUserChatHistory($from_user_id, $to_user_id);
 
         include ROOT . '/views/layouts/chat_history.php';
+
+        return true;
     }
 
+    /**
+     * @return bool
+     */
     private function groupChatHistory()
     {
         $db = DB::getConnection();
@@ -64,6 +83,8 @@ class MessageController
         $messagesList = Message::getGroupChatHistory();
 
         include ROOT . '/views/layouts/chat_history.php';
+
+        return true;
     }
 
 }

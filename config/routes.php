@@ -3,6 +3,7 @@
 return array(
     'login' => 'user/login',
     'logout' => 'user/logout',
+    'regiser' => 'user/register',
 
     'insert_message' => 'message/insertMessage',
     'insert_group_message' => 'message/insertGroupMessage',
