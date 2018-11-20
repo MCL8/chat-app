@@ -93,7 +93,6 @@ class Message
             if ($queryResult->execute($data)) {
                 return true;
             }
-
         }
 
         return false;

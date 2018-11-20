@@ -73,9 +73,9 @@ $(document).ready(function(){
 				class="form-control chat_message"></textarea>
 			</div>
 			<div class="form-group" align="right">
-				<button type="button" name="send_chat" id="${to_user_id}" class="btn btn-info send_chat">Send</button>
+				<button type="button" name="send_chat" id="${to_user_id}" class="btn btn-primary send_chat">Send</button>
 			</div>
-			</div>`;
+		</div>`;
 		$('#user_model_details').html(modal_content);
 	}
 
@@ -88,25 +88,20 @@ $(document).ready(function(){
 			width:400
 		});
 		$('#user_dialog_' + to_user_id).dialog('open');
-		$('#chat_message_' + to_user_id).emojioneArea({
-			pickerPosition: "top",
-			toneStyle: "bullet"
-		});
 	});
 
 	$(document).on('click', '.send_chat', function(){
 		var to_user_id = $(this).attr('id');
 		var chat_message = $('#chat_message_' + to_user_id).val();
-		$.ajax({
-			url: "insert_message",
-			method: "POST",
-			data: {to_user_id:to_user_id, chat_message:chat_message},
-			success:function(data) {
-				var element = $('#chat_message_' + to_user_id).emojioneArea();
-				element[0].emojioneArea.setText('');
-				$('#chat_history_' + to_user_id).html(data);
-			}
-		});
+        if(chat_message != '') {
+            $.ajax({
+                url: "insert_message",
+                method: "POST",
+                data: {to_user_id: to_user_id, chat_message: chat_message},
+                success: function () {
+                }
+            });
+        }
 	});
 
 	$(document).on('click', '.ui-button-icon', function(){
