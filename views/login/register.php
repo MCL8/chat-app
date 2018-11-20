@@ -37,7 +37,7 @@
                     <input type="password" name="password" class="form-control" required />
                 </div>
                 <div class="form-group">
-                    <input type="submit" name="submit" class="btn btn-info" value="Register" />
+                    <input type="submit" name="submit" class="btn btn-primary" value="Register" />
                 </div>
             </form>
         </div>

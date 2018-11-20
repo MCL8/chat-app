@@ -24,16 +24,11 @@
 							<input type="password" name="password" class="form-control" required />
 						</div>
 						<div class="form-group">
-							<input type="submit" name="login" class="btn btn-info" value="Login" />
+							<input type="submit" name="login" class="btn btn-primary" value="Login" />
 						</div>
 					</form>
                     <a href="regiser">REGISTER</a>
 					<br/>
-					<br/>
-					<p><b>User 1</b></p>
-					<p><b>Username</b> - johnsmith<br/><b>Password</b> - password</p>
-					<p><b>Username</b> - peterParker<br/><b>Password</b> - password</p>
-					<p><b>Username</b> - davidMoore<br/><b>Password</b> - password</p>
 					<br/>
 					<br/>
 				</div>
