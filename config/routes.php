@@ -14,5 +14,7 @@ return array(
     'update/group_chat_history' => 'message/getGroupChatHistory',
     'update/is_type' => 'user/updateIsType',
 
+    'file_upload' => 'upload/upload',
+
     '' => 'site/index',
 );

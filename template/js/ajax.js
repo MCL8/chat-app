@@ -1,13 +1,11 @@
 
 $(document).ready(function(){
 	getUser();
-
 	setInterval(function(){
         getGroupChatHistory();
         getUser();
         updateChatHistory();
 		updateLastActivity();
-
 	}, 1000);
 
     function getGroupChatHistory() {

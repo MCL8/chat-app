@@ -1,0 +1,1 @@
+<p><img src="<?php echo 'upload/' . $fileName; ?>" class="img-thumbnail" width="200" height="160" /></p><br />

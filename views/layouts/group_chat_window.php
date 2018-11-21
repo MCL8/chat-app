@@ -6,8 +6,8 @@
             <div id="group_chat_message" contenteditable class="form-control">
             </div>
             <div class="image_upload">
-                <form id="uploadImage" method="post" action="upload.php">
-                    <label for="uploadFile"><img src="upload.png" /></label>
+                <form id="uploadImage" method="post" action="file_upload">
+                    <label for="uploadFile"><img src="template/images/upload.png" /></label>
                     <input type="file" name="uploadFile" id="uploadFile" accept=".jpg, .png" />
                 </form>
             </div>
